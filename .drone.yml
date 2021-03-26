@@ -13,8 +13,8 @@ steps:
   - git add results/
   - git add hangnail_data.json
   - git commit -m 'update'
-  - git config --user.email --global 'dronebot@ricetek.net'
-  - git config --user.name --global 'dronebot'
+  - git config user.email 'dronebot@ricetek.net'
+  - git config user.name 'dronebot'
   - git push --set-upstream origin main
   environment:
     GITHUB_KEY:
