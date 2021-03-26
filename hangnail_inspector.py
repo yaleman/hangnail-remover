@@ -87,13 +87,11 @@ def handle_signature_file(filename:str):
     return toenail_data
 
 @click.command()
-@click.option('--debug','-d', is_flag=True, default=True)
+@click.option('--debug','-d', is_flag=True, default=False)
 @click.option('--update','-u', is_flag=True, default=False)
 def cli(debug:bool, update:bool):
     """ do the needful """
     setup_logging(debug, logger)
-
-
 
     hangnail_data = []
     try:
@@ -132,13 +130,7 @@ def cli(debug:bool, update:bool):
     runfile = f'results/{runtime}.json'
     logger.info("Keys seen: {}", seen_keys)
 
-    writefile = True
-    if os.path.exists(DATA_FILENAME):
-        oldfile = open(DATA_FILENAME, 'r').read().strip()
-        if str(json.dumps(hangnail_data)).strip() == oldfile:
-            logger.warning("No change to data, no file to be written.")
-            writefile = False
-    if writefile:
+    if update:
         logger.info("Writing file...")
         with open(runfile, 'w') as file_handle:
             json.dump(obj=hangnail_data,
