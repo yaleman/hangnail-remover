@@ -12,7 +12,7 @@ Host github.com
   User git
   StrictHostKeyChecking no
   UserKnownHostsFile=/dev/null
-  IdentityFile /home/splunk/.ssh/github.com
+  IdentityFile ~/.ssh/github.com
 
 EOM
 
