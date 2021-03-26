@@ -15,7 +15,7 @@ steps:
   - git commit -m 'update'
   - git config user.email 'dronebot@ricetek.net'
   - git config user.name 'dronebot'
-  - git remote del origin
+  - git remote remove origin
   - git remote add -t main origin 'git@github.com:rms-support-letter/rms-support-letter.github.io.git'
   - git push --set-upstream origin main
   environment:
