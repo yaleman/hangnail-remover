@@ -1,19 +1,11 @@
 #!/bin/bash
 
-mkdir -p ~/.ssh/
+cd "$HOME/hangnail-remover/" || exit 1
 
-echo "${GITHUB_KEY}" > ~/.ssh/github.com
+git pull
+python3 hangnail_inspector.py --update
 
-chmod 0600 ~/.ssh/github.com
+git add results/
+git commit -am "update $(date +%Y-%m-%d-%H:%M)"
+git push
 
-cat > ~/.ssh/config <<-EOM
-
-Host github.com
-  User git
-  StrictHostKeyChecking no
-  UserKnownHostsFile=/dev/null
-  IdentityFile ~/.ssh/github.com
-
-EOM
-
-git clone 'git@github.com:rms-support-letter/rms-support-letter.github.io.git' sourcerepo
