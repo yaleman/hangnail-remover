@@ -139,11 +139,6 @@ def cli(debug:bool, update:bool):
         if os.path.exists(DATA_FILENAME):
             os.unlink(DATA_FILENAME)
         os.symlink(runfile,DATA_FILENAME)
-        logger.info("Committing file...")
-        g = Git(SOURCEREPO)
-        g.add('*')
-        g.commit("Updates")
-        g.push()
 
 if __name__ == '__main__':
     cli()
