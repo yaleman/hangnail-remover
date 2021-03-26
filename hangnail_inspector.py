@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
 import json
+from logging import error, exception
 import os
 import re
 import sys
 import time
 
 import click
-from git import Repo
+from git import Repo, Git
 import git.remote
 from git.exc import InvalidGitRepositoryError
 from loguru import logger
@@ -17,7 +18,7 @@ if not os.path.exists("results/"):
     os.mkdir("results")
 SOURCEREPO = 'sourcerepo'
 SIGNATURE_DIR = f"{SOURCEREPO}/_data/signed"
-
+DATA_FILENAME = 'hangnail_data.json'
 USER_FINDERS = [
     re.compile(r"(?i)(http(s|))://(www\.|)github\.com/(?P<github_username>[^/\?]+)"),
     re.compile(r"(?i)(http(s|))://(www\.|)gitlab\.com/(?P<gitlab_username>[^/\?]+)"),
@@ -25,6 +26,7 @@ USER_FINDERS = [
     re.compile(r"(?i)(http(s|))://(www\.|)vk\.com/(?P<vk_username>[^/\?]+)"),
     re.compile(r"(?i)(http(s|))://(www\.|)linkedin\.com/in/(?P<linkedin_username>[^/\?]+)"),
 ]
+REMOTE_URL = 'git@github.com:rms-support-letter/rms-support-letter.github.io.git'
 
 def setup_logging(debug: bool, logger_object):
     """ sets up logging """
@@ -84,8 +86,6 @@ def handle_signature_file(filename:str):
     logger.debug(toenail_data)
     return toenail_data
 
-
-
 @click.command()
 @click.option('--debug','-d', is_flag=True, default=True)
 @click.option('--update','-u', is_flag=True, default=False)
@@ -93,24 +93,25 @@ def cli(debug:bool, update:bool):
     """ do the needful """
     setup_logging(debug, logger)
 
-    if not os.path.exists(SOURCEREPO):
-        os.mkdir(SOURCEREPO)
 
-    repo = Repo(SOURCEREPO)
 
-    #repo = 'rms-support-letter/rms-support-letter.github.io'
+    hangnail_data = []
+    try:
+        if os.path.exists(DATA_FILENAME):
+            hangnail_data += json.load(open(DATA_FILENAME,'r'))
+    except Exception as error_message:
+        logger.error("Couldn't load {}, {}", DATA_FILENAME, error_message)
 
     # print(dir(repo))
 
     if update:
-        for remote in repo.remotes:
-            #if remote.name == 'origin':
-            #print(dir(remote))
-            #print(remote.name)
-            if remote.name == 'origin':
-                logger.info("Pulling origin")
-                logger.debug(remote.pull())
-                logger.info("Done.")
+        if not os.path.exists(SOURCEREPO):
+            logger.error("Can't find source repo: {}", SOURCEREPO)
+            g = Git()
+            g.clone(REMOTE_URL, SOURCEREPO)
+        else:
+            g = Git(SOURCEREPO)
+            g.pull()
 
     if not os.path.exists(SIGNATURE_DIR):
         logger.error("Can't find signatures dir: {}", SIGNATURE_DIR)
@@ -118,7 +119,6 @@ def cli(debug:bool, update:bool):
 
 
     seen_keys = []
-    hangnail_data = []
     for filename in os.listdir(SIGNATURE_DIR):
         full_filename = os.path.join(SIGNATURE_DIR,filename)
         signature = handle_signature_file(full_filename)
@@ -133,9 +133,9 @@ def cli(debug:bool, update:bool):
     logger.info("Keys seen: {}", seen_keys)
 
     writefile = True
-    if os.path.exists('hangnail_data.json'):
-        oldfile = open('hangnail_data.json', 'r').read()
-        if json.dumps(hangnail_data) == oldfile:
+    if os.path.exists(DATA_FILENAME):
+        oldfile = open(DATA_FILENAME, 'r').read().strip()
+        if str(json.dumps(hangnail_data)).strip() == oldfile:
             logger.warning("No change to data, no file to be written.")
             writefile = False
     if writefile:
@@ -144,9 +144,9 @@ def cli(debug:bool, update:bool):
             json.dump(obj=hangnail_data,
                       fp=file_handle,
                       )
-        if os.path.exists('hangnail_data.json'):
-            os.unlink('hangnail_data.json')
-        os.symlink(runfile,'hangnail_data.json')
+        if os.path.exists(DATA_FILENAME):
+            os.unlink(DATA_FILENAME)
+        os.symlink(runfile,DATA_FILENAME)
 
 if __name__ == '__main__':
     cli()
