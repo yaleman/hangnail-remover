@@ -6,7 +6,7 @@ steps:
 - name: dothethings
   image: python:3.9
   commands:
-  - apt -y install git
+  - apt-get -y install git
   - pip install -r requirements.txt
   - ./runscript.sh
   - python3 hangnail_inspector.py --update
@@ -15,8 +15,9 @@ steps:
   - git commit -m 'update'
   - git config user.email 'dronebot@ricetek.net'
   - git config user.name 'dronebot'
-  - cat .git/config
-  #- git push --set-upstream origin main
+  - git remote del origin
+  - git remote add -t main origin 'git@github.com:rms-support-letter/rms-support-letter.github.io.git'
+  - git push --set-upstream origin main
   environment:
     GITHUB_KEY:
       from_secret: GITHUB_KEY
