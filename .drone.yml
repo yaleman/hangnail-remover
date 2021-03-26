@@ -10,7 +10,8 @@ steps:
   - pip install -r requirements.txt
   - ./runscript.sh
   - python3 hangnail_inspector.py --update
-  - git add *
+  - git add results/
+  - git add hangnail_data.json
   - git commit -m 'update'
   - git config --user.email --global 'dronebot@ricetek.net'
   - git config --user.name --global 'dronebot'
