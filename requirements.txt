@@ -1,1 +1,3 @@
 GitPython
+click
+loguru
