@@ -8,6 +8,7 @@ steps:
   commands:
   - apt -y install git
   - pip install -r requirements.txt
+  - ./runscript.sh
   - python3 hangnail_inspector.py --update
   - git add *
   - git commit -m 'update'
