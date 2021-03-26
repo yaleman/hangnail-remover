@@ -127,7 +127,7 @@ def cli(debug:bool, update:bool):
         if signature not in hangnail_data:
             hangnail_data.append(signature)
 
-    logger.info("Keys seen: {}", seen_keys)
+    logger.debug("Keys seen: {}", seen_keys)
 
     if update:
         logger.info("Writing file...")

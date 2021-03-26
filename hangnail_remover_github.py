@@ -6,7 +6,7 @@ import os
 
 import click
 from loguru import logger
-import ghapi
+from ghapi.all import GhApi
 
 def setup_logging(debug: bool, logger_object):
     """ sets up logging """
@@ -29,16 +29,33 @@ def cli(debug:bool, update:bool):
     setup_logging(debug, logger)
 
     try:
-        with open(os.path.join('./',os.readlink('hangnail_data.json')), 'r') as file_handle:
+        with open('hangnail_data.json', 'r') as file_handle:
             data = json.load(file_handle)
     except Exception as error_message:
         logger.error(error_message)
         sys.exit(1)
 
-    for user in data:
-        if 'github_username' in user:
-            logger.debug("Blocking: {}", user.get('github_username'))
+    try:
+        from config import GITHUB_TOKEN
+    except ImportError:
+        GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+    if not GITHUB_TOKEN:
+        logger.error("Couldn't load github token")
+        sys.exit(1)
 
+    api = GhApi(token=GITHUB_TOKEN)
+    logger.debug("Current user: {}",api.users.get_authenticated().login)
+
+    currently_blocked = api.users.list_blocked_by_authenticated() # this doesn't work, wtf?
+    for user in currently_blocked:
+        logger.debug("B: {}", user)
+
+    #for user in data:
+    #    if 'github_username' in user:
+    #        logger.debug("Blocking: {}", user.get('github_username'))
+
+            #https://docs.github.com/en/rest/reference/users#block-a-user
+            # block_user = users.block(username)
 
 
 

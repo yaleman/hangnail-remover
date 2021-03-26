@@ -1,2 +1,3 @@
 sourcerepo/
 .vscode
+__pycache__/*
