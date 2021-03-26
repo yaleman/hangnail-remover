@@ -1,0 +1,19 @@
+kind: pipeline
+type: docker
+name: hangnail-remover
+
+steps:
+- name: dothethings
+  image: python:3.9
+  commands:
+  - apt -y install git
+  - pip install -r requirements.txt
+  - python3 run hangnail_inspector.py --update
+  - git add *
+  - git commit -m 'update'
+  - git config --user.email --global 'dronebot@ricetek.net'
+  - git config --user.name --global 'dronebot'
+  - git push --set-upstream origin main
+  environment:
+    GITHUB_KEY:
+      from_secret: GITHUB_KEY
