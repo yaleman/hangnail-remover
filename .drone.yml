@@ -8,7 +8,7 @@ steps:
   commands:
   - apt -y install git
   - pip install -r requirements.txt
-  - python3 run hangnail_inspector.py --update
+  - python3 hangnail_inspector.py --update
   - git add *
   - git commit -m 'update'
   - git config --user.email --global 'dronebot@ricetek.net'
