@@ -124,21 +124,15 @@ def cli(debug:bool, update:bool):
         for key in signature:
             if key not in seen_keys:
                 seen_keys.append(key)
-        hangnail_data.append(signature)
+        if signature not in hangnail_data:
+            hangnail_data.append(signature)
 
-    runtime = str(round(time.time(),0))
-    runfile = f'results/{runtime}.json'
     logger.info("Keys seen: {}", seen_keys)
 
     if update:
         logger.info("Writing file...")
-        with open(runfile, 'w') as file_handle:
-            json.dump(obj=hangnail_data,
-                      fp=file_handle,
-                      )
-        if os.path.exists(DATA_FILENAME):
-            os.unlink(DATA_FILENAME)
-        os.symlink(runfile,DATA_FILENAME)
+        with open(DATA_FILENAME, 'w') as file_handle:
+            json.dump(obj=hangnail_data,fp=file_handle)
 
 if __name__ == '__main__':
     cli()
